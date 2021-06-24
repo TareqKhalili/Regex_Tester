@@ -3,6 +3,13 @@
 
 ### check out the webssite here: https://regex-visual-486fa.firebaseapp.com/
 
+**Features**
+
+1. Instant results
+2. Save expressions to use them later 
+3. Cheat sheet included
+
+
 ## Project setup
 ```
 yarn install
