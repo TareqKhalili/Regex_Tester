@@ -3,7 +3,7 @@
 
 ### check out the webssite here: https://regex-visual-486fa.firebaseapp.com/
 
-**Features**
+### __Features__
 
 1. Instant results
 2. Save expressions to use them later 
