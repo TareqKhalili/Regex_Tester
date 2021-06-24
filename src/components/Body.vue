@@ -1,9 +1,23 @@
 <template>
     <div class="inputArea">
-        <input type="text" @keyup="evaluate" autocomplete="disable" placeholder="Expression" v-model="exp" id="exp">
+        <div class="expression">
+            <input type="text" @keyup="evaluate" placeholder="Expression" v-model="exp" id="exp">
+            <input type="text" @keyup="evaluate" placeholder="Flags" v-model="flags" id="flags">
+            <button class="save" @click="save">Save</button>
+        </div>
         <input type="text" @keyup="evaluate" :placeholder="exp" v-model="text" id="text">
     </div>
     <div class="outputArea">
+    </div>
+    <div class="savedExpressions">
+        <table id="savedExp">
+            <tr>
+                <th>Expression</th>
+                <th>Flags</th>
+            </tr>
+            <tr>
+            </tr>
+        </table>
     </div>
     <button id="viewSheet" @click="show">Show Cheat Sheet</button>
     <div class="sheet hidden" id="sheet1">
@@ -93,15 +107,17 @@ export default {
     data() {
         return {
             exp: "",
+            flags: "",
             text: "Here is -some- 123 ex@ample text",
             result: "",
             sheetHidden: true,
+            savedExp: [],
         }
     },
     methods: {
         evaluate() {
             document.getElementsByClassName("outputArea")[0].innerHTML = "";
-            let exp = new RegExp(this.exp, "");
+            let exp = new RegExp(this.exp, this.flags);
             this.result = exp.exec(this.text);
             for (let i = 0; i < this.result.length; i++) {
                 let output = document.createElement('div');
@@ -121,8 +137,36 @@ export default {
                 this.sheetHidden = true;
                 document.getElementById("viewSheet").textContent = "Show Cheat Sheet"
             }
+        },
+        save() {
+            localStorage.setItem(this.exp, this.flags);
+            let expColumn = document.createElement('td');
+            expColumn.textContent = this.exp;
+            let flagsColumn = document.createElement('td');
+            flagsColumn.textContent = this.flags;
+            let row = document.createElement('tr');
+            row.appendChild(expColumn);
+            row.appendChild(flagsColumn);
+            document.getElementById('savedExp').appendChild(row);
+        },
+        createTable() {
+            for ( let i = 0; i < localStorage.length; i++) {
+                if (localStorage.getItem(localStorage.key(i)) == 'SILENT') continue;
+                console.log(localStorage.getItem(localStorage.key(i)))
+                let expColumn = document.createElement('td');
+                expColumn.textContent = localStorage.key(i);
+                let flagsColumn = document.createElement('td');
+                flagsColumn.textContent = localStorage.getItem(localStorage.key(i));
+                let row = document.createElement('tr');
+                row.appendChild(expColumn);
+                row.appendChild(flagsColumn);
+                document.getElementById('savedExp').appendChild(row);
+            }
         }
-    }
+    },
+      mounted() {
+        this.createTable();
+    },
 }
 </script>
 
@@ -148,6 +192,35 @@ input {
     border-radius: 10px;
 }
 
+.expression {
+    margin: 0 auto;
+    display: flex;
+    width: 80%;
+    align-items: baseline;
+}
+
+.expression #exp {
+    width: 70%;
+}
+.expression #flags {
+    width: 20%;
+    margin: 0px 5px;
+}
+
+.savedExpressions {
+    width: 100%;
+}
+
+.savedExpressions table {
+    margin: 15px auto 0px;
+    width: 70%;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.savedExpressions td, .savedExpressions th {
+    font-size: 20px;
+}
+
 .outputArea {
     display: flex;
     flex-wrap: wrap;
@@ -167,16 +240,19 @@ input {
     padding: 30px;
     display: flex;
     justify-content: center;
+    transform: translateX(0%);
+    transition: .3s;
 }
 
 table {
     margin: 20px 5px;
     width: 300px;
     border-collapse: collapse;
+    transition: .3s;
 }
 
 
-td, tr {
+td, tr, th {
     border: 1px solid rgba(0, 0, 0, 0.377);
     padding: 10px;
     font-size: 15px;
@@ -185,10 +261,10 @@ td, tr {
 }
 
 .hidden {
-    display: none;
+    transform: translateX(-150%);
 }
 
-#viewSheet {
+#viewSheet, .save {
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     border: none;
     border-radius: 10px;
@@ -202,9 +278,14 @@ td, tr {
     transition: .3s;
 }
 
-#viewSheet:hover {
+#viewSheet:hover, .save:hover {
     background: rgb(20,33,61);;
 }
 
 
+.save {
+    margin: 30px 10px 10px;
+    padding: 10px;
+
+}
 </style>
